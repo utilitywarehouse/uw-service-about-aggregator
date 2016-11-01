@@ -8,7 +8,7 @@
     {{with .Abouts}}
     {{range .}}
     <tr>
-        <td><a href="/api/v1/proxy/namespaces/{{.Service.Namespace}}/services/{{.Service.Name}}:80/__/about">{{.Service.Namespace}}.{{.Service.Name}}</a></td>
+        <td><a href="/../../../{{.Service.Namespace}}/services/{{.Service.Name}}:80/__/about">{{.Service.Namespace}}.{{.Service.Name}}</a></td>
     </tr>
     {{end}}
     {{end}}
