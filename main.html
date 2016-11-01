@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<head>
+    <title>UW Documentation</title>
+</head>
+<body>
+<h1>UW Documented services</h1>
+<table style='font-size: 10pt; font-family: MONOSPACE;'>
+    {{with .Abouts}}
+    {{range .}}
+    <tr>
+        <td><a href="/api/v1/proxy/namespaces/{{.Service.Namespace}}/services/{{.Service.Name}}:80/__/about">{{.Service.Namespace}}.{{.Service.Name}}</a></td>
+    </tr>
+    {{end}}
+    {{end}}
+</table>
+</body>
+</html>

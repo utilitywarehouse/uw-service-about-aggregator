@@ -1,6 +1,5 @@
 *.exe*
 *.log
-*.html
 *coverage.*
 *.iml
 .idea/

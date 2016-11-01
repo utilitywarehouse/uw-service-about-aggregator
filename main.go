@@ -37,12 +37,15 @@ func main() {
 			panic(fmt.Sprintf("Could not create service discovery: error=(%v)", err))
 		}
 		f := NewAboutFetcher()
-		e := exporter{}
+		exporters := []exporter{}
+		httpExporter := NewHTTPExporter()
+		exporters = append(exporters, httpExporter)
+		e := exporterService{exporters: exporters}
 		h := handler{discovery: d}
 
 		go d.getServices()
 		go f.readAbouts(services, about, errors)
-		go e.export(about)
+		go e.export(about, errors)
 		go func() {
 			for e := range errors {
 				log.Printf("ERROR: %v", e)
@@ -52,6 +55,7 @@ func main() {
 		m := mux.NewRouter()
 		http.Handle("/", handlers.CombinedLoggingHandler(os.Stdout, m))
 		m.HandleFunc("/reload", h.reload).Methods("POST")
+		m.HandleFunc("/__/about", httpExporter.handleHTTP).Methods("GET")
 
 		log.Printf("Listening on [%v].\n", port)
 		err = http.ListenAndServe(":"+*port, nil)
@@ -99,20 +103,22 @@ func (a *aboutFetcher) readAbouts(services chan Service, about chan About, error
 					select {
 					case errors <- fmt.Errorf("Could not get response from %v: (%v)", s.BaseURL, err):
 					default:
-						continue
 					}
+					continue
 				}
-				resp, _ := a.client.Do(req)
+				resp, err := a.client.Do(req)
 				if err != nil {
 					select {
 					case errors <- fmt.Errorf("Could not get response from %v: (%v)", s.BaseURL, err):
 					default:
-						continue
 					}
+					continue
 				}
 				defer func() {
-					io.Copy(ioutil.Discard, resp.Body)
-					resp.Body.Close()
+					if resp != nil && resp.Body != nil {
+						io.Copy(ioutil.Discard, resp.Body)
+						resp.Body.Close()
+					}
 				}()
 
 				if resp.StatusCode != http.StatusOK {

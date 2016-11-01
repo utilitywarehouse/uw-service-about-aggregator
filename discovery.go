@@ -33,8 +33,8 @@ func (d *serviceDiscovery) getServices() {
 		select {
 		case d.errors <- fmt.Errorf("Could not get namespaces via kubernetes api: (%v)", err):
 		default:
-			return
 		}
+		return
 	}
 	for _, n := range namespaces.Items {
 		services, err := d.client.Core().Services(n.Name).List(v1.ListOptions{LabelSelector: d.label})
@@ -42,8 +42,8 @@ func (d *serviceDiscovery) getServices() {
 			select {
 			case d.errors <- fmt.Errorf("Could not get services via kubernetes api: (%v)", err):
 			default:
-				return
 			}
+			return
 		}
 
 		for _, s := range services.Items {
