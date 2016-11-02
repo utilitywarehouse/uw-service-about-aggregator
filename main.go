@@ -76,8 +76,12 @@ func (h *handler) reload(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "{\"ok\":true}")
 }
 
+type httpClient interface {
+	Do(req *http.Request) (resp *http.Response, err error)
+}
+
 type aboutFetcher struct {
-	client *http.Client
+	client httpClient
 }
 
 func NewAboutFetcher() aboutFetcher {
@@ -114,17 +118,20 @@ func (a *aboutFetcher) readAbouts(services chan Service, about chan About, error
 					}
 					continue
 				}
-				defer func() {
+
+				if resp.StatusCode != http.StatusOK {
+					select {
+					case errors <- fmt.Errorf("__/about returned %d for %s", resp.StatusCode, s.BaseURL):
+					default:
+					}
 					if resp != nil && resp.Body != nil {
 						io.Copy(ioutil.Discard, resp.Body)
 						resp.Body.Close()
 					}
-				}()
-
-				if resp.StatusCode != http.StatusOK {
-					log.Printf("WARN: __/about returned %d for %s ", resp.StatusCode, s.BaseURL)
+					continue
 				}
 				bytes, _ := ioutil.ReadAll(resp.Body)
+				resp.Body.Close()
 				about <- About{Service: s, Doc: bytes}
 			}
 		}(services, about)

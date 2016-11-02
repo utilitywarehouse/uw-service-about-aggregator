@@ -5,13 +5,18 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/rest"
+	v1core "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type serviceDiscovery struct {
-	client *kubernetes.Clientset
+	client kubernetesClient
 	label  string
 	res    chan<- Service
 	errors chan<- error
+}
+
+type kubernetesClient interface {
+	Core() v1core.CoreInterface
 }
 
 func NewServiceDiscovery(label string, res chan<- Service, errors chan<- error) (*serviceDiscovery, error) {
