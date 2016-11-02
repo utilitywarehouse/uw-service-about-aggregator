@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	app := cli.App("uw-aggregate-about", "Calls /__/about for services that expose the endpoint")
+	app := cli.App("about-aggregator", "Calls /__/about for services that expose the endpoint")
 	port := app.String(cli.StringOpt{
 		Name:   "port",
 		Value:  "8080",
