@@ -172,7 +172,7 @@ type mockServiceClient struct {
 	services *v1.ServiceList
 }
 
-func (s *mockServiceClient) List(opts v1.ListOptions) (*v1.ServiceList, error) {
+func (c *mockServiceClient) List(opts v1.ListOptions) (*v1.ServiceList, error) {
 	expectedOpts := v1.ListOptions{LabelSelector: "about=true"}
 	if opts == expectedOpts {
 		return s.services, nil

@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"k8s.io/client-go/kubernetes"
+	v1core "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/rest"
-	v1core "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type serviceDiscovery struct {
@@ -19,7 +19,7 @@ type kubernetesClient interface {
 	Core() v1core.CoreInterface
 }
 
-func NewServiceDiscovery(label string, res chan<- Service, errors chan<- error) (*serviceDiscovery, error) {
+func newServiceDiscovery(label string, res chan<- Service, errors chan<- error) (*serviceDiscovery, error) {
 
 	config, err := rest.InClusterConfig()
 	if err != nil {

@@ -36,7 +36,7 @@ func TestHTTPExporterHandler(t *testing.T) {
 }
 
 func createHTTPExporterAndHandle(about About) *httpExporter {
-	httpExporter := NewHTTPExporter()
+	httpExporter := newHTTPExporter()
 	httpExporter.handle(about)
 	return httpExporter
 }
