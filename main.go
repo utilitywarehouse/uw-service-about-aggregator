@@ -32,7 +32,7 @@ func main() {
 		errors := make(chan error, 10)
 		services := make(chan Service, 10)
 		about := make(chan About, 10)
-		d, err := NewServiceDiscovery(*label, services, errors)
+		d, err := newServiceDiscovery(*label, services, errors)
 		if err != nil {
 			panic(fmt.Sprintf("Could not create service discovery: error=(%v)", err))
 		}
