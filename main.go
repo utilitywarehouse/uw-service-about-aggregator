@@ -38,7 +38,7 @@ func main() {
 		}
 		f := newAboutFetcher()
 		exporters := []exporter{}
-		httpExporter := NewHTTPExporter()
+		httpExporter := newHTTPExporter()
 		exporters = append(exporters, httpExporter)
 		e := exporterService{exporters: exporters}
 		h := handler{discovery: d}

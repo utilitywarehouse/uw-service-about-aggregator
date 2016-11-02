@@ -34,7 +34,7 @@ func (e *exporterService) export(about chan About, errors chan error) {
 	}
 }
 
-func NewHTTPExporter() *httpExporter {
+func newHTTPExporter() *httpExporter {
 	return &httpExporter{mutex: &sync.RWMutex{}, abouts: make(map[string]About)}
 }
 
