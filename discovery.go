@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"k8s.io/client-go/kubernetes"
 	v1core "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/rest"
+	"net"
 )
 
 type serviceDiscovery struct {
@@ -19,9 +21,9 @@ type kubernetesClient interface {
 	Core() v1core.CoreInterface
 }
 
-func newServiceDiscovery(label string, res chan<- Service, errors chan<- error) (*serviceDiscovery, error) {
+func newServiceDiscovery(host string, port string, tokenPath string, certPath string, label string, res chan<- Service, errors chan<- error) (*serviceDiscovery, error) {
 
-	config, err := rest.InClusterConfig()
+	config, err := clusterConfig(host, port, tokenPath, certPath)
 	if err != nil {
 		return &serviceDiscovery{}, err
 	}
@@ -30,6 +32,21 @@ func newServiceDiscovery(label string, res chan<- Service, errors chan<- error) 
 		return &serviceDiscovery{}, err
 	}
 	return &serviceDiscovery{client: clientset, label: label, res: res, errors: errors}, nil
+}
+
+func clusterConfig(host string, port string, tokenPath string, certPath string) (*rest.Config, error) {
+	token, err := ioutil.ReadFile(tokenPath)
+	if err != nil {
+		return nil, err
+	}
+	tlsClientConfig := rest.TLSClientConfig{}
+	tlsClientConfig.CAFile = certPath
+
+	return &rest.Config{
+		Host:            "https://" + net.JoinHostPort(host, port),
+		BearerToken:     string(token),
+		TLSClientConfig: tlsClientConfig,
+	}, nil
 }
 
 func (d *serviceDiscovery) getServices() {

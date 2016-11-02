@@ -28,11 +28,35 @@ func main() {
 		Desc:   "Label to filter services via kubernetes api",
 		EnvVar: "LABEL",
 	})
+	kubernetesHost := app.String(cli.StringOpt{
+		Name:   "kubernetes-service-host",
+		Value:  "",
+		Desc:   "Kubernetes service host",
+		EnvVar: "KUBERNETES_SERVICE_HOST",
+	})
+	kubernetesPort := app.String(cli.StringOpt{
+		Name:   "kubernetes-service-port",
+		Value:  "",
+		Desc:   "Kubernetes service port",
+		EnvVar: "KUBERNETES_SERVICE_PORT",
+	})
+	kubernetesTokenPath := app.String(cli.StringOpt{
+		Name:   "kubernetes-token-path",
+		Value:  "/var/run/secrets/kubernetes.io/serviceaccount/token",
+		Desc:   "Path to the kubernetes api token",
+		EnvVar: "KUBERNETES_TOKEN_PATH",
+	})
+	kubernetesCertPath := app.String(cli.StringOpt{
+		Name:   "kubernetes-cert-path",
+		Value:  "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
+		Desc:   "Path to the kubernetes cert",
+		EnvVar: "KUBERNETES_CERT_PATH",
+	})
 	app.Action = func() {
 		errors := make(chan error, 10)
 		services := make(chan Service, 10)
 		about := make(chan About, 10)
-		d, err := newServiceDiscovery(*label, services, errors)
+		d, err := newServiceDiscovery(*kubernetesHost, *kubernetesPort, *kubernetesTokenPath, *kubernetesCertPath, *label, services, errors)
 		if err != nil {
 			log.Fatalf("ERROR: Could not create service discovery: error=(%v)", err)
 		}
@@ -57,7 +81,7 @@ func main() {
 		m.HandleFunc("/reload", h.reload).Methods("POST")
 		m.HandleFunc("/__/about", httpExporter.handleHTTP).Methods("GET")
 
-		log.Printf("Listening on [%v].\n", port)
+		log.Printf("Listening on [%v].\n", *port)
 		err = http.ListenAndServe(":"+*port, nil)
 		if err != nil {
 			log.Fatalf("ERROR: Web server failed: error=(%v).\n", err)
