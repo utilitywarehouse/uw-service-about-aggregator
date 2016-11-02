@@ -71,8 +71,8 @@ func (c *mockCoreClient) Services(namespace string) v1core.ServiceInterface {
 
 }
 
-func (c *mockCoreClient) GetRESTClient() *rest.RESTClient {
-	return &rest.RESTClient{}
+func (c *mockCoreClient) RESTClient() rest.Interface {
+	return nil
 }
 
 func (c *mockCoreClient) ComponentStatuses() v1core.ComponentStatusInterface {
@@ -175,7 +175,7 @@ type mockServiceClient struct {
 func (c *mockServiceClient) List(opts v1.ListOptions) (*v1.ServiceList, error) {
 	expectedOpts := v1.ListOptions{LabelSelector: "about=true"}
 	if opts == expectedOpts {
-		return s.services, nil
+		return c.services, nil
 	}
 	return &v1.ServiceList{}, fmt.Errorf("No service matching label")
 }
