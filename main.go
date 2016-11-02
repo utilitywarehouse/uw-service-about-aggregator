@@ -36,7 +36,7 @@ func main() {
 		if err != nil {
 			panic(fmt.Sprintf("Could not create service discovery: error=(%v)", err))
 		}
-		f := NewAboutFetcher()
+		f := newAboutFetcher()
 		exporters := []exporter{}
 		httpExporter := NewHTTPExporter()
 		exporters = append(exporters, httpExporter)
@@ -84,7 +84,7 @@ type aboutFetcher struct {
 	client httpClient
 }
 
-func NewAboutFetcher() aboutFetcher {
+func newAboutFetcher() aboutFetcher {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			MaxIdleConnsPerHost: 128,
