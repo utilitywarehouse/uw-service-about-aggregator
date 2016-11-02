@@ -34,7 +34,7 @@ func main() {
 		about := make(chan About, 10)
 		d, err := newServiceDiscovery(*label, services, errors)
 		if err != nil {
-			panic(fmt.Sprintf("Could not create service discovery: error=(%v)", err))
+			log.Fatalf("ERROR: Could not create service discovery: error=(%v)", err)
 		}
 		f := newAboutFetcher()
 		exporters := []exporter{}
@@ -60,7 +60,7 @@ func main() {
 		log.Printf("Listening on [%v].\n", port)
 		err = http.ListenAndServe(":"+*port, nil)
 		if err != nil {
-			panic(fmt.Sprintf("Web server failed: error=(%v).\n", err))
+			log.Fatalf("ERROR: Web server failed: error=(%v).\n", err)
 		}
 	}
 	app.Run(os.Args)
