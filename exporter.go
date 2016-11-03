@@ -35,11 +35,11 @@ func (e *exporterService) export(about chan About, errors chan error) {
 }
 
 func newHTTPExporter() *httpExporter {
-	return &httpExporter{mutex: &sync.RWMutex{}, abouts: make(map[string]About)}
+	return &httpExporter{mutex: sync.RWMutex{}, abouts: make(map[string]About)}
 }
 
 type httpExporter struct {
-	mutex  *sync.RWMutex //protects abouts
+	mutex  sync.RWMutex //protects abouts
 	abouts map[string]About
 }
 
