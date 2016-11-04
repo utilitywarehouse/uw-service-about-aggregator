@@ -16,13 +16,13 @@ const jsonResponse = "[{\"Service\":{\"Name\":\"uw-service-refdata\",\"Namespace
 
 func TestExporterService(t *testing.T) {
 	errors := make(chan error, 10)
-	about := make(chan About, 10)
+	ab := make(chan about, 10)
 	exporters := []exporter{newHTTPExporter(), newHTTPExporter()}
 	e := exporterService{exporters: exporters}
-	about <- About{}
-	close(about)
+	ab <- about{}
+	close(ab)
 	close(errors)
-	e.export(about, errors)
+	e.export(ab, errors)
 	//give the exporters a chance to process as they run in different go routines
 	time.Sleep(1 * time.Second)
 
@@ -48,8 +48,8 @@ func TestHTTPExporterHandler(t *testing.T) {
 		contentType string // Contents of the Content-Type header
 		body        string
 	}{
-		{"Success html", newRequest("GET", "/__/about", "text/html"), createHTTPExporterAndHandle(About{Service: Service{Name: "uw-service-refdata", Namespace: "billing"}}), http.StatusOK, "text/html", htmlResponse},
-		{"Success json", newRequest("GET", "/__/about", "application/json"), createHTTPExporterAndHandle(About{Service: Service{Name: "uw-service-refdata", Namespace: "billing"}}), http.StatusOK, "application/json", jsonResponse},
+		{"Success html", newRequest("GET", "/__/about", "text/html"), createHTTPExporterAndHandle(about{Service: service{Name: "uw-service-refdata", Namespace: "billing"}}), http.StatusOK, "text/html", htmlResponse},
+		{"Success json", newRequest("GET", "/__/about", "application/json"), createHTTPExporterAndHandle(about{Service: service{Name: "uw-service-refdata", Namespace: "billing"}}), http.StatusOK, "application/json", jsonResponse},
 	}
 
 	for _, test := range tests {
@@ -60,7 +60,7 @@ func TestHTTPExporterHandler(t *testing.T) {
 	}
 }
 
-func createHTTPExporterAndHandle(about About) *httpExporter {
+func createHTTPExporterAndHandle(about about) *httpExporter {
 	httpExporter := newHTTPExporter()
 	httpExporter.handle(about)
 	return httpExporter

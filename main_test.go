@@ -12,10 +12,10 @@ import (
 func TestFetcherAboutAddedToChannel(t *testing.T) {
 	a := assert.New(t)
 	errors := make(chan error, 10)
-	services := make(chan Service, 10)
-	about := make(chan About, 10)
+	services := make(chan service, 10)
+	about := make(chan about, 10)
 
-	expectedService := Service{Name: "someService", Namespace: "billing", BaseURL: "http://someService.billing/"}
+	expectedService := service{Name: "someService", Namespace: "billing", BaseURL: "http://someService.billing/"}
 	services <- expectedService
 	close(services)
 
@@ -37,10 +37,10 @@ func TestFetcherAboutAddedToChannel(t *testing.T) {
 func TestFetcherErrorAddedToChannel(t *testing.T) {
 	a := assert.New(t)
 	errors := make(chan error, 10)
-	services := make(chan Service, 10)
-	about := make(chan About, 10)
+	services := make(chan service, 10)
+	about := make(chan about, 10)
 
-	expectedService := Service{Name: "someService", Namespace: "billing", BaseURL: "http://someService.billing/"}
+	expectedService := service{Name: "someService", Namespace: "billing", BaseURL: "http://someService.billing/"}
 	services <- expectedService
 	close(services)
 
@@ -60,10 +60,10 @@ func TestFetcherErrorAddedToChannel(t *testing.T) {
 func TestFetcherErrorAddedToChannelForNon200(t *testing.T) {
 	a := assert.New(t)
 	errors := make(chan error, 10)
-	services := make(chan Service, 10)
-	about := make(chan About, 10)
+	services := make(chan service, 10)
+	about := make(chan about, 10)
 
-	expectedService := Service{Name: "someService", Namespace: "billing", BaseURL: "http://someService.billing/"}
+	expectedService := service{Name: "someService", Namespace: "billing", BaseURL: "http://someService.billing/"}
 	services <- expectedService
 	close(services)
 

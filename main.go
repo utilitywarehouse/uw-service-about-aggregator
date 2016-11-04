@@ -54,8 +54,8 @@ func main() {
 	})
 	app.Action = func() {
 		errors := make(chan error, 10)
-		services := make(chan Service, 10)
-		about := make(chan About, 10)
+		services := make(chan service, 10)
+		about := make(chan about, 10)
 		d, err := newServiceDiscovery(*kubernetesHost, *kubernetesPort, *kubernetesTokenPath, *kubernetesCertPath, *label, services, errors)
 		if err != nil {
 			log.Fatalf("ERROR: Could not create service discovery: error=(%v)", err)
@@ -121,10 +121,10 @@ func newAboutFetcher() aboutFetcher {
 	return aboutFetcher{client: httpClient}
 }
 
-func (a *aboutFetcher) readAbouts(services chan Service, about chan About, errors chan error) {
+func (a *aboutFetcher) readAbouts(services chan service, ab chan about, errors chan error) {
 	readers := 5
 	for i := 0; i < readers; i++ {
-		go func(services chan Service, about chan About) {
+		go func(services chan service, ab chan about) {
 			for s := range services {
 				req, err := http.NewRequest("GET", s.BaseURL+"__/about", nil)
 				if err != nil {
@@ -156,14 +156,14 @@ func (a *aboutFetcher) readAbouts(services chan Service, about chan About, error
 				}
 				bytes, _ := ioutil.ReadAll(resp.Body)
 				resp.Body.Close()
-				about <- About{Service: s, Doc: bytes}
+				ab <- about{Service: s, Doc: bytes}
 			}
-		}(services, about)
+		}(services, ab)
 	}
 
 }
 
-type About struct {
-	Service Service
+type about struct {
+	Service service
 	Doc     []byte
 }
