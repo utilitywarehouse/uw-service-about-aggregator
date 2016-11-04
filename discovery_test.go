@@ -13,7 +13,7 @@ import (
 
 func TestDiscoveryServicesAddedToChannel(t *testing.T) {
 	errors := make(chan error, 10)
-	services := make(chan Service, 10)
+	services := make(chan service, 10)
 	d := serviceDiscovery{client: &mockK8Client{}, label: "about=true", res: services, errors: errors}
 
 	go func() {
@@ -35,7 +35,7 @@ func TestDiscoveryServicesAddedToChannel(t *testing.T) {
 
 func TestDiscoveryErrorAddedToChannel(t *testing.T) {
 	errors := make(chan error, 10)
-	services := make(chan Service, 10)
+	services := make(chan service, 10)
 	d := serviceDiscovery{client: &mockK8Client{}, label: "", res: services, errors: errors}
 
 	go func() {

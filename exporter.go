@@ -13,15 +13,14 @@ type exporterService struct {
 }
 
 type exporter interface {
-	handle(about About) error
+	handle(about about) error
 }
 
-func (e *exporterService) export(about chan About, errors chan error) {
+func (e *exporterService) export(about chan about, errors chan error) {
 	for a := range about {
 		for _, ex := range e.exporters {
-
-			go func() {
-				err := ex.handle(a)
+			go func(exporter exporter) {
+				err := exporter.handle(a)
 				if err != nil {
 					select {
 					case errors <- fmt.Errorf("Error while exporting: (%v)", err):
@@ -29,21 +28,21 @@ func (e *exporterService) export(about chan About, errors chan error) {
 						return
 					}
 				}
-			}()
+			}(ex)
 		}
 	}
 }
 
 func newHTTPExporter() *httpExporter {
-	return &httpExporter{mutex: sync.RWMutex{}, abouts: make(map[string]About)}
+	return &httpExporter{mutex: sync.RWMutex{}, abouts: make(map[string]about)}
 }
 
 type httpExporter struct {
 	mutex  sync.RWMutex //protects abouts
-	abouts map[string]About
+	abouts map[string]about
 }
 
-func (h *httpExporter) handle(about About) error {
+func (h *httpExporter) handle(about about) error {
 	h.mutex.Lock()
 	h.abouts[about.Service.Name] = about
 	h.mutex.Unlock()
@@ -59,7 +58,7 @@ func (h *httpExporter) handleHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *httpExporter) jsonHandler(w http.ResponseWriter, r *http.Request) {
-	a := []About{}
+	a := []about{}
 	h.mutex.RLock()
 	for _, about := range h.abouts {
 		a = append(a, about)
@@ -76,7 +75,7 @@ func (h *httpExporter) jsonHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *httpExporter) htmlHandler(w http.ResponseWriter, r *http.Request) {
-	a := []About{}
+	a := []about{}
 	h.mutex.RLock()
 	for _, about := range h.abouts {
 		a = append(a, about)
@@ -89,7 +88,7 @@ func (h *httpExporter) htmlHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Couldn't open template file for html response"))
 		return
 	}
-	if err = mainTemplate.Execute(w, struct{ Abouts []About }{Abouts: a}); err != nil {
+	if err = mainTemplate.Execute(w, struct{ Abouts []about }{Abouts: a}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Couldn't render template file for html response"))
 		return

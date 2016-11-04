@@ -8,10 +8,35 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 const htmlResponse = "<!DOCTYPE html>\n<head>\n    <title>UW Documentation</title>\n</head>\n<body>\n<h1>UW Documented services</h1>\n<table style='font-size: 10pt; font-family: MONOSPACE;'>\n    \n    \n    <tr>\n        <td><a href=\"/../../../billing/services/uw-service-refdata:80/__/about\">billing.uw-service-refdata</a></td>\n    </tr>\n    \n    \n</table>\n</body>\n</html>"
 const jsonResponse = "[{\"Service\":{\"Name\":\"uw-service-refdata\",\"Namespace\":\"billing\",\"BaseURL\":\"\"},\"Doc\":null}]"
+
+func TestExporterService(t *testing.T) {
+	errors := make(chan error, 10)
+	ab := make(chan about, 10)
+	exporters := []exporter{newHTTPExporter(), newHTTPExporter()}
+	e := exporterService{exporters: exporters}
+	ab <- about{}
+	close(ab)
+	close(errors)
+	e.export(ab, errors)
+	//give the exporters a chance to process as they run in different go routines
+	time.Sleep(1 * time.Second)
+
+	for i, ex := range e.exporters {
+		fmt.Println(i)
+		assert.Equal(t, 1, func() int {
+			ex.(*httpExporter).mutex.RLock()
+			l := len(ex.(*httpExporter).abouts)
+			ex.(*httpExporter).mutex.RUnlock()
+			return l
+		}())
+	}
+
+}
 
 func TestHTTPExporterHandler(t *testing.T) {
 	assert := assert.New(t)
@@ -23,8 +48,8 @@ func TestHTTPExporterHandler(t *testing.T) {
 		contentType string // Contents of the Content-Type header
 		body        string
 	}{
-		{"Success html", newRequest("GET", "/__/about", "text/html"), createHTTPExporterAndHandle(About{Service: Service{Name: "uw-service-refdata", Namespace: "billing"}}), http.StatusOK, "text/html", htmlResponse},
-		{"Success json", newRequest("GET", "/__/about", "application/json"), createHTTPExporterAndHandle(About{Service: Service{Name: "uw-service-refdata", Namespace: "billing"}}), http.StatusOK, "application/json", jsonResponse},
+		{"Success html", newRequest("GET", "/__/about", "text/html"), createHTTPExporterAndHandle(about{Service: service{Name: "uw-service-refdata", Namespace: "billing"}}), http.StatusOK, "text/html", htmlResponse},
+		{"Success json", newRequest("GET", "/__/about", "application/json"), createHTTPExporterAndHandle(about{Service: service{Name: "uw-service-refdata", Namespace: "billing"}}), http.StatusOK, "application/json", jsonResponse},
 	}
 
 	for _, test := range tests {
@@ -35,7 +60,7 @@ func TestHTTPExporterHandler(t *testing.T) {
 	}
 }
 
-func createHTTPExporterAndHandle(about About) *httpExporter {
+func createHTTPExporterAndHandle(about about) *httpExporter {
 	httpExporter := newHTTPExporter()
 	httpExporter.handle(about)
 	return httpExporter

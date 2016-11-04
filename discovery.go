@@ -13,7 +13,7 @@ import (
 type serviceDiscovery struct {
 	client kubernetesClient
 	label  string
-	res    chan<- Service
+	res    chan<- service
 	errors chan<- error
 }
 
@@ -21,7 +21,7 @@ type kubernetesClient interface {
 	Core() v1core.CoreInterface
 }
 
-func newServiceDiscovery(host string, port string, tokenPath string, certPath string, label string, res chan<- Service, errors chan<- error) (*serviceDiscovery, error) {
+func newServiceDiscovery(host string, port string, tokenPath string, certPath string, label string, res chan<- service, errors chan<- error) (*serviceDiscovery, error) {
 
 	config, err := clusterConfig(host, port, tokenPath, certPath)
 	if err != nil {
@@ -69,7 +69,7 @@ func (d *serviceDiscovery) getServices() {
 		}
 
 		for _, s := range services.Items {
-			d.res <- Service{
+			d.res <- service{
 				Name:      s.Name,
 				Namespace: n.Name,
 				BaseURL:   fmt.Sprintf("http://%s.%s/", s.Name, n.Name),
@@ -78,7 +78,7 @@ func (d *serviceDiscovery) getServices() {
 	}
 }
 
-type Service struct {
+type service struct {
 	Name      string
 	Namespace string
 	BaseURL   string
