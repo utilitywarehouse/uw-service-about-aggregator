@@ -19,9 +19,8 @@ type exporter interface {
 func (e *exporterService) export(about chan About, errors chan error) {
 	for a := range about {
 		for _, ex := range e.exporters {
-
-			go func() {
-				err := ex.handle(a)
+			go func(exporter exporter) {
+				err := exporter.handle(a)
 				if err != nil {
 					select {
 					case errors <- fmt.Errorf("Error while exporting: (%v)", err):
@@ -29,7 +28,7 @@ func (e *exporterService) export(about chan About, errors chan error) {
 						return
 					}
 				}
-			}()
+			}(ex)
 		}
 	}
 }
