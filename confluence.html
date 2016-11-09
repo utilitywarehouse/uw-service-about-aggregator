@@ -1,0 +1,33 @@
+
+<table style='font-size: 10pt; font-family: MONOSPACE;'>
+    {{with .Abouts}}
+    {{range .}}
+    <tr>
+        <td>
+            <h2>{{.Service.Namespace}}.{{.Service.Name}}</h2>
+            <p>Description: {{.Doc.Description}}</p>
+            <p>Owners<ul>
+            {{with .Doc.Owners}}
+            {{range .}}
+            <li>{{.Name}}</li>
+            <ul style="list-style-type:square">
+                <li>Slack: {{.Slack}}</li>
+            </ul>
+            {{end}}
+            {{end}}
+            </ul></p>
+            <p>Links<ul>
+            {{with .Doc.Links}}
+            {{range .}}
+            <li><a href="{{.URL}}">{{.Description}}</a></li>
+            {{end}}
+            {{end}}
+            </ul></p>
+            <p>Build-info<ul>
+            <li>Revision: {{.Doc.BuildInfo.Revision}}</li>
+            </ul></p>
+        </td>
+    </tr>
+    {{end}}
+    {{end}}
+</table>
