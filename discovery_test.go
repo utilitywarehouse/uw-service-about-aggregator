@@ -67,7 +67,7 @@ func (c *mockCoreClient) Namespaces() v1core.NamespaceInterface {
 }
 
 func (c *mockCoreClient) Services(namespace string) v1core.ServiceInterface {
-	return &mockServiceClient{services: &v1.ServiceList{Items: []v1.Service{v1.Service{ObjectMeta: v1.ObjectMeta{Name: "someService"}}}}}
+	return &mockServiceClient{services: &v1.ServiceList{Items: []v1.Service{{ObjectMeta: v1.ObjectMeta{Name: "someService"}}}}}
 
 }
 
@@ -136,7 +136,7 @@ type mockNamespaceClient struct {
 
 func (n *mockNamespaceClient) List(opts v1.ListOptions) (*v1.NamespaceList, error) {
 	return &v1.NamespaceList{Items: []v1.Namespace{
-		v1.Namespace{ObjectMeta: v1.ObjectMeta{Name: "billing"}}}}, nil
+		{ObjectMeta: v1.ObjectMeta{Name: "billing"}}}}, nil
 }
 
 func (n *mockNamespaceClient) Create(*v1.Namespace) (*v1.Namespace, error) {
