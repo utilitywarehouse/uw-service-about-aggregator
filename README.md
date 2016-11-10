@@ -20,7 +20,7 @@ export KUBERNETES_SERVICE_HOST="192.168.99.100"
 export KUBERNETES_SERVICE_PORT="8443"
 export KUBERNETES_TOKEN_PATH="/var/run/secrets/kubernetes.io/serviceaccount/token"
 export KUBERNETES_CERT_PATH="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-export CONFLUENCE_HOST="https://utilitywarehouse.atlassian.net"
+export CONFLUENCE_HOST="https://confluence.example.com"
 export CONFLUENCE_CREDENTIALS="base 64 encoded <user:pass>" #Get the credentials from lastpass: Shared-Kubernetes/confluence/uw-service-about-aggregator 
 export CONFLUENCE_PAGE_ID="page id to update"
 
