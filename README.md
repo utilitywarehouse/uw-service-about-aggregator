@@ -1,4 +1,5 @@
 # About Aggregator
+[![CircleCI](https://circleci.com/gh/utilitywarehouse/uw-service-about-aggregator.svg?style=shield)](https://circleci.com/gh/utilitywarehouse/uw-service-about-aggregator)
 
 Does service discovery via kubernetes api and calls `/__/about` for each service that exposes the endpoint. Service are filtered based on labels(`about=true`).   
 For each service this information is pushed to several exporters:   
