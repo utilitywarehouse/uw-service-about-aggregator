@@ -19,7 +19,7 @@ func TestFetcherAboutAddedToChannel(t *testing.T) {
 	services <- expectedService
 	close(services)
 
-	fetcher := aboutFetcher{client: &dummyClient{assert: a, URL: "http://someService.billing/__/about", resp: http.Response{StatusCode: http.StatusOK, Body: ioutil.NopCloser(strings.NewReader("about endpoint response"))}, err: nil}}
+	fetcher := aboutFetcher{client: &dummyClient{assert: a, URL: "http://someService.billing/__/about", resp: http.Response{StatusCode: http.StatusOK, Body: ioutil.NopCloser(strings.NewReader("{\"description\":\"about endpoint response\"}"))}, err: nil}}
 	fetcher.readAbouts(services, about, errors)
 
 	select {
@@ -28,7 +28,7 @@ func TestFetcherAboutAddedToChannel(t *testing.T) {
 
 	case about := <-about:
 		assert.Equal(t, expectedService, about.Service)
-		assert.Equal(t, "about endpoint response", string(about.Doc))
+		assert.Equal(t, doc{Description: "about endpoint response"}, about.Doc)
 	}
 	close(about)
 	close(errors)
@@ -50,6 +50,29 @@ func TestFetcherErrorAddedToChannel(t *testing.T) {
 	select {
 	case err := <-errors:
 		assert.EqualError(t, err, "Could not get response from http://someService.billing/: (error calling __about)")
+	case <-about:
+		t.Errorf("Should not get any about")
+	}
+	close(about)
+	close(errors)
+}
+
+func TestFetcherErrorAddedToChannelForNonJSON(t *testing.T) {
+	a := assert.New(t)
+	errors := make(chan error, 10)
+	services := make(chan service, 10)
+	about := make(chan about, 10)
+
+	expectedService := service{Name: "someService", Namespace: "billing", BaseURL: "http://someService.billing/"}
+	services <- expectedService
+	close(services)
+
+	fetcher := aboutFetcher{client: &dummyClient{assert: a, URL: "http://someService.billing/__/about", resp: http.Response{StatusCode: http.StatusOK, Body: ioutil.NopCloser(strings.NewReader("non json"))}, err: nil}}
+	fetcher.readAbouts(services, about, errors)
+
+	select {
+	case err := <-errors:
+		assert.EqualError(t, err, "Could not json decode __/about response for http://someService.billing/")
 	case <-about:
 		t.Errorf("Should not get any about")
 	}

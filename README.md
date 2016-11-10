@@ -6,7 +6,7 @@ Does service discovery via kubernetes api and calls `/__/about` for each service
 For each service this information is pushed to several exporters:   
 
    * HTTP exporter - exposes list of services which expose /__/about   
-   * (not currently implemented) Confluence exporter
+   * Confluence exporter - pushes the list of services which expose /__/about to confluence
 
 ## Developing
 
@@ -22,8 +22,11 @@ export KUBERNETES_SERVICE_HOST="192.168.99.100"
 export KUBERNETES_SERVICE_PORT="8443"
 export KUBERNETES_TOKEN_PATH="/var/run/secrets/kubernetes.io/serviceaccount/token"
 export KUBERNETES_CERT_PATH="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+export CONFLUENCE_HOST="https://confluence.example.com"
+export CONFLUENCE_CREDENTIALS="base 64 encoded <user:pass>" #Get the credentials from lastpass: Shared-Kubernetes/confluence/uw-service-about-aggregator 
+export CONFLUENCE_PAGE_ID="page id to update"
 
-$GOPATH/bin/about-aggregator
+$GOPATH/bin/uw-service-about-aggregator
 ```
 
 
