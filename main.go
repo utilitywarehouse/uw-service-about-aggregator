@@ -65,7 +65,7 @@ func main() {
 	})
 	confluenceHost := app.String(cli.StringOpt{
 		Name:   "confluence-host",
-		Value:  "https://utilitywarehouse.atlassian.net",
+		Value:  "",
 		Desc:   "Confluence host",
 		EnvVar: "CONFLUENCE_HOST",
 	})

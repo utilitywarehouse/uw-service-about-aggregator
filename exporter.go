@@ -158,7 +158,7 @@ func (h *confluenceExporter) handle(ab about) error {
 func (h *confluenceExporter) getConfluencePage(pageID string) (confluencePage, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/wiki/rest/api/content/%s", h.confluenceHost, h.confluencePageID), nil)
 	if err != nil {
-		return confluencePage{}, fmt.Errorf("Could not get response from %v: (%v)", req.URL.String(), err)
+		return confluencePage{}, fmt.Errorf("Could not create get page request for %v: (%v)", h.confluencePageID, err)
 	}
 	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", h.confluenceCredentials))
 	resp, err := h.client.Do(req)
@@ -185,7 +185,7 @@ func (h *confluenceExporter) updateConfluencePage(newPage confluencePage) error 
 	json.NewEncoder(payload).Encode(newPage)
 	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/wiki/rest/api/content/%s", h.confluenceHost, h.confluencePageID), payload)
 	if err != nil {
-		return fmt.Errorf("Could not get response from %v: (%v)", req.URL.String(), err)
+		return fmt.Errorf("Could not create update page request for %v: (%v)", h.confluencePageID, err)
 	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", h.confluenceCredentials))
