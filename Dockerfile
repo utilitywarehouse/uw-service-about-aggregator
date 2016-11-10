@@ -3,7 +3,8 @@ FROM alpine:3.4
 ADD *.go /uw-service-about-aggregator/
 ADD *.html /
 
-RUN apk add --update bash \
+RUN apk add --no-cache ca-certificates \
+  && apk add --update bash \
   && apk --update add git bzr \
   && apk --update add go \
   && export GOPATH=/gopath \
