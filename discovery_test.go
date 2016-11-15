@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	v1core "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/watch"
 	"k8s.io/client-go/rest"
-	"testing"
 )
 
 func TestDiscoveryServicesAddedToChannel(t *testing.T) {
@@ -55,7 +56,7 @@ func TestDiscoveryErrorAddedToChannel(t *testing.T) {
 type mockK8Client struct {
 }
 
-func (m *mockK8Client) Core() v1core.CoreInterface {
+func (m *mockK8Client) Core() v1core.CoreV1Interface {
 	return &mockCoreClient{}
 }
 

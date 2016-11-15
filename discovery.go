@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"net"
+
 	"k8s.io/client-go/kubernetes"
 	v1core "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/rest"
-	"net"
 )
 
 type serviceDiscovery struct {
@@ -18,7 +19,7 @@ type serviceDiscovery struct {
 }
 
 type kubernetesClient interface {
-	Core() v1core.CoreInterface
+	Core() v1core.CoreV1Interface
 }
 
 func newServiceDiscovery(host string, port string, tokenPath string, certPath string, label string, res chan<- service, errors chan<- error) (*serviceDiscovery, error) {
